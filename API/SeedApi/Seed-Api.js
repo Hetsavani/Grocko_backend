@@ -28,10 +28,22 @@ const SeedSchema = new mongoose.Schema({
   });
   const seedmodel = mongoose.model('Seed-Api', SeedSchema);
   router.use(express.json());
+  router.get('/seed/:id', async (req, res) => {
+    try {
+        const seed = await seedmodel.findOne({ Seed_id: req.params.id });
+        if (!seed) {
+            return res.status(404).send({ message: 'Seed not found' });
+        }
+        res.send(seed);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
   router.get('/seed',async (req, res) => {
     const seed = await seedmodel.find();
         res.send(seed);
   });
+  
 //   router.post('/seed',async (req, res) => {
 //     console.log(req.body);
 //     const admin = new adminmodel({
