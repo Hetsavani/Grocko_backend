@@ -5,6 +5,7 @@ const VendorApiRouter = require("./VendorApi/Vendor-Api");
 const InventoryApiRouter = require("./VendorSeedInventory/VendorSeed-Api");
 const OrderApiRouter = require("./OrderSeedApi/orderapi");
 const TransportApiRouter = require("./TransportAPI/Transport-Api");
+const SubsidyApiRouter = require("./SubsidyApi/Subsidy-Api");
 
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -31,6 +32,7 @@ mongoose
     app.use("/inventoryapi", InventoryApiRouter);
     app.use("/orderapi", OrderApiRouter);
     app.use("/transportapi", TransportApiRouter);
+    app.use("/subsidyapi", SubsidyApiRouter);
 
     app.listen(3030, () => {
       console.log("Server started at port 3030 !");

@@ -5,7 +5,8 @@ const sequenceSchema = new mongoose.Schema({
   seed_sequence_value: { type: Number, default: 101 },
   vendor_sequence_value: { type: Number, default: 1 },
   inventory_sequence_value: { type: Number, default:1},
-  order_sequence_value: { type: Number, default: 11111 }, 
+  order_sequence_value: { type: Number, default: 11111 },
+  subsidy_sequence_value: { type: Number, default: 1 },
 });
 
 const Sequence = mongoose.model('Sequence', sequenceSchema);
