@@ -30,6 +30,21 @@ const inventorySchema = new mongoose.Schema({
   });
   const inventorymodel = mongoose.model('VendorSeed-Api', inventorySchema);
   router.use(express.json());
+  router.get('/inventory/:id', async (req, res) => {
+    try {
+        const inventory = await inventorymodel.findOne({ inventory_id: req.params.id })
+            .populate('vendor_id') // Populate vendor details
+            .populate('seed_id'); // Populate seed details
+
+        if (!inventory) {
+            return res.status(404).json({ message: 'Inventory not found' });
+        }
+
+        res.json(inventory);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
   router.get('/inventory',async (req, res) => {
     try {
         const inventories = await inventorymodel.find()
