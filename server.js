@@ -2,14 +2,17 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const cors = require("cors");
 
-// Import the TransportRequest model
+// Import the TransportRequest and User models
 const TransportRequest = require("./models/TransportRequest");
+const User = require("./models/User");
 
 const app = express();
 const port = 3000;
 
 // Middleware
+app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 
 // Connect to MongoDB
@@ -22,35 +25,51 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Register endpoint
-app.post("/register", (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res
-      .status(400)
-      .json({ message: "Username and password are required" });
+app.post("/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Username and password are required" });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Create a new user
+    const newUser = new User({ username, password }); // Hash password before saving in production
+
+    await newUser.save();
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
-
-  // Store passwords in plaintext (not recommended for production)
-  users.push({ username, password });
-
-  res.status(201).json({ message: "User registered successfully" });
 });
 
 // Login endpoint
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res
-      .status(400)
-      .json({ message: "Username and password are required" });
-  }
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Username and password are required" });
+    }
 
-  const user = users.find((user) => user.username === username);
-  if (!user || user.password !== password) {
-    return res.status(401).json({ message: "Invalid username or password" });
-  }
+    const user = await User.findOne({ username });
+    if (!user || user.password !== password) {
+      // Compare hashed password in production
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
 
-  res.status(200).json({ message: "User Found successfully" });
+    res.status(200).json({ message: "User found successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
 });
 
 // Create transport request endpoint
